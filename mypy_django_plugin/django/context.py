@@ -23,12 +23,6 @@ from mypy.types import TypeOfAny, UnionType
 
 from mypy_django_plugin.lib import fullnames, helpers
 
-try:
-    from django.contrib.postgres.fields import ArrayField
-except ImportError:
-    class ArrayField:  # type: ignore
-        pass
-
 if TYPE_CHECKING:
     from django.apps.registry import Apps  # noqa: F401
     from django.conf import LazySettings  # noqa: F401
@@ -86,6 +80,13 @@ class DjangoContext:
         self.django_settings_module = django_settings_module
 
         apps, settings = initialize_django(self.django_settings_module)
+
+        try:
+            from django.contrib.postgres.fields import ArrayField
+        except ImportError:
+            class ArrayField:  # type: ignore
+                pass
+
         self.apps_registry = apps
         self.settings = settings
 
